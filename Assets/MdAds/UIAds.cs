@@ -9,14 +9,19 @@ namespace MdAds
         public InputField inputField;
         private UniWebView _webView;
 
+        private int _width;
+        private int _height;
+
         private void Start()
         {
+            Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) => TrafficInfo.Idfa = advertisingId);
             InitWebView();
             Destroy(GetComponent<Image>());
         }
 
         public void LoadAd()
         {
+            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={_width}placementheight={_height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
             _webView.Load(inputField.text);
         }
