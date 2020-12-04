@@ -1,33 +1,69 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MdAds
 {
     public class UIAds : MonoBehaviour
     {
-        public InputField inputField;
-        private UniWebView _webView;
+        [SerializeField]
+        private int width;
 
-        private int _width;
-        private int _height;
+        [SerializeField]
+        private int height;
+
+        [SerializeField] 
+        private bool isDebug;
+
+        private UniWebView _webView;
+        private bool _noAds = true;
 
         private void Start()
         {
-            Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) => TrafficInfo.Idfa = advertisingId);
+            if (TrafficInfo.Idfa == "")
+            {
+                Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) => TrafficInfo.Idfa = advertisingId);
+            }
             InitWebView();
             Destroy(GetComponent<Image>());
         }
 
         public void LoadAd()
         {
-            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={_width}placementheight={_height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
+            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
-            _webView.Load(inputField.text);
+            _webView.Load(url);
+            
+            // Add Callback
+            _webView.OnPageFinished += (view, code, s) =>
+            {
+                _noAds = code != 0;
+                if (!isDebug) return;
+                ShowToast(code== 0 ? "Ad loaded":$"No Ads! code :{code}");
+            };
+
+            // Capture Landing Pages
+            _webView.AddUrlScheme("md");
+            _webView.OnMessageReceived += (view, message) =>
+            {
+                if (message.Scheme == "md")
+                {
+                    if (message.Path != "landing-page") return;
+                    
+                    var hasUrl = message.Args.ContainsKey("url");
+                    if (!hasUrl) return;
+                    
+                    var landingPage = message.Args["url"];
+                    Application.OpenURL(WWW.UnEscapeURL(landingPage));
+                }
+            };
         }
 
         public void ShowAd()
         {
+            if (_noAds)
+            {
+                return;
+            }
             _webView.Show();
         }
 
@@ -41,5 +77,32 @@ namespace MdAds
             var webViewGameObject = new GameObject("UniWebView");
             _webView = webViewGameObject.AddComponent<UniWebView>();
         }
+
+        private void ShowToast(string msg)
+        {
+            //create a Toast class object
+            AndroidJavaClass toastClass =
+                new AndroidJavaClass("android.widget.Toast");
+
+            //create an array and add params to be passed
+            object[] toastParams = new object[3];
+            AndroidJavaClass unityActivity =
+                new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            toastParams[0] =
+                unityActivity.GetStatic<AndroidJavaObject>
+                    ("currentActivity");
+            toastParams[1] = msg;
+            toastParams[2] = toastClass.GetStatic<int>
+                ("LENGTH_LONG");
+
+            //call static function of Toast class, makeText
+            AndroidJavaObject toastObject =
+                toastClass.CallStatic<AndroidJavaObject>
+                    ("makeText", toastParams);
+
+            //show toast
+            toastObject.Call("show");
+        }
+
     }
 }
