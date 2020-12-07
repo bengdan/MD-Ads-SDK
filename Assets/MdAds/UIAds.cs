@@ -29,16 +29,21 @@ namespace MdAds
 
         public void LoadAd()
         {
-            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
+            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
             _webView.Load(url);
+            
+            if (isDebug)
+            {
+                GUIUtility.systemCopyBuffer = url;
+            }
             
             // Add Callback
             _webView.OnPageFinished += (view, code, s) =>
             {
-                _noAds = code != 0;
+                _noAds = code != 200;
                 if (!isDebug) return;
-                ShowToast(code== 0 ? "Ad loaded":$"No Ads! code :{code}");
+                ShowToast(code== 200 ? "Ad loaded!":$"No Ads! code :{code}");
             };
 
             // Capture Landing Pages
