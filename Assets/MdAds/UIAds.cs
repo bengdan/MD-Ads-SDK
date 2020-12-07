@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MdAds
@@ -58,7 +59,7 @@ namespace MdAds
                     if (!hasUrl) return;
                     
                     var landingPage = message.Args["url"];
-                    Application.OpenURL(WWW.UnEscapeURL(landingPage));
+                    Application.OpenURL(Uri.UnescapeDataString(landingPage));
                 }
             };
         }
