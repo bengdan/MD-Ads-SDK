@@ -20,7 +20,7 @@ namespace MdAds
 
         private void Start()
         {
-            if (TrafficInfo.Idfa == "")
+            if (TrafficInfo.Idfa == default)
             {
                 Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) => TrafficInfo.Idfa = advertisingId);
             }
@@ -30,7 +30,7 @@ namespace MdAds
 
         public void LoadAd()
         {
-            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}";
+            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel=MD-SDK%3A{width}x{height}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
             _webView.Load(url);
             
