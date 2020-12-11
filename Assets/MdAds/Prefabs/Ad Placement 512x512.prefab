@@ -91,3 +91,5 @@ MonoBehaviour:
   width: 512
   height: 512
   isDebug: 1
+  autoShow: 1
+  autoHide: 1

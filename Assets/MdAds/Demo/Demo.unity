@@ -612,7 +612,7 @@ MonoBehaviour:
       - m_Target: {fileID: 743071921}
         m_TargetAssemblyTypeName: MdAds.UIAds, Assembly-CSharp
         m_MethodName: LoadAd
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1305,7 +1305,7 @@ MonoBehaviour:
       - m_Target: {fileID: 981636721}
         m_TargetAssemblyTypeName: MdAds.UIAds, Assembly-CSharp
         m_MethodName: LoadAd
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2553,7 +2553,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1880847535}
         m_TargetAssemblyTypeName: MdAds.UIAds, Assembly-CSharp
         m_MethodName: LoadAd
-        m_Mode: 1
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3730,6 +3730,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ad Placement 320x480
       objectReference: {fileID: 0}
+    - target: {fileID: 1571469406553286970, guid: 29b97854f58153e458cb0f6d33cc4ed8, type: 3}
+      propertyPath: autoShow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1571469406553286970, guid: 29b97854f58153e458cb0f6d33cc4ed8, type: 3}
+      propertyPath: autoHide
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1571469406553286971, guid: 29b97854f58153e458cb0f6d33cc4ed8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3911,6 +3919,14 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3127317334838971580, guid: 12cd0bc4600608746a09e37b7e6cdd9c, type: 3}
+      propertyPath: autoShow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3127317334838971580, guid: 12cd0bc4600608746a09e37b7e6cdd9c, type: 3}
+      propertyPath: autoHide
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12cd0bc4600608746a09e37b7e6cdd9c, type: 3}
 --- !u!1001 &6255178316104073678
@@ -4007,6 +4023,14 @@ PrefabInstance:
     - target: {fileID: 6255178317018601406, guid: c83c070d2504cd342a8c0bf5e28a9344, type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6255178317018601407, guid: c83c070d2504cd342a8c0bf5e28a9344, type: 3}
+      propertyPath: autoShow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6255178317018601407, guid: c83c070d2504cd342a8c0bf5e28a9344, type: 3}
+      propertyPath: autoHide
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83c070d2504cd342a8c0bf5e28a9344, type: 3}
