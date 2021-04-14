@@ -62,13 +62,15 @@ namespace MdAds
             // Add Callback
             _webView.OnPageFinished += (view, code, s) =>
             {
+                _webView.SetOpenLinksInExternalBrowser(true);
+                
                 _noAds = code != 200;
                 if (showAfter)
                 {
                     ShowAd();
                 }
                 if (!isDebug) return;
-                ShowToast(code== 200 ? "Ad loaded!":$"No Ads! code :{code}");
+                ShowTip(code== 200 ? "Ad loaded!":$"No Ads! code :{code}");
             };
 
             // Capture Landing Pages
@@ -108,6 +110,16 @@ namespace MdAds
             _webView = webViewGameObject.AddComponent<UniWebView>();
         }
 
+        private void ShowTip(string msg)
+        {
+#if UNITY_ANDROID
+            ShowToast(msg);
+#elif UNITY_IOS
+            Debug.Log(msg);
+#endif
+        }
+        
+        
         private void ShowToast(string msg)
         {
             //create a Toast class object
