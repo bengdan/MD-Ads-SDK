@@ -62,6 +62,8 @@ namespace MdAds
             // Add Callback
             _webView.OnPageFinished += (view, code, s) =>
             {
+                _webView.SetOpenLinksInExternalBrowser(true);
+                
                 _noAds = code != 200;
                 if (showAfter)
                 {
