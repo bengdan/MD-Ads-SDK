@@ -50,12 +50,26 @@ namespace MdAds
                     Debug.Log("advertisingId " + advertisingId + " " + trackingEnabled + " " + error);
                 });
             }
-            
+
+            RequestGaid();
+        }
+
+        private static void RequestGaid()
+        {
             AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
-            
+
             AndroidJavaClass helperClass = new AndroidJavaClass("unity.idfa.helper.Helper");
-            helperClass.CallStatic("getGaid",activityContext);
+            helperClass.CallStatic("getGaid", activityContext);
+        }
+        private static void PrintGaid()
+        {
+            AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
+
+            AndroidJavaClass helperClass = new AndroidJavaClass("unity.idfa.helper.Helper");
+            var gaid = helperClass.GetStatic<string>("GAID");
+            print(gaid);
         }
 
         private void OnEnable()
@@ -74,6 +88,7 @@ namespace MdAds
 
         public void LoadAd(bool showAfter = false)
         {
+            PrintGaid();
             var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel=MD-SDK%3A{width}x{height}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
             _webView.Load(url);
