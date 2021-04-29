@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.UI;
 
 namespace MdAds
@@ -26,12 +27,35 @@ namespace MdAds
 
         private void Awake()
         {
-            if (TrafficInfo.Idfa == default)
-            {
-                Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) => TrafficInfo.Idfa = advertisingId);
-            }
             InitWebView();
             Destroy(GetComponent<Image>());
+        }
+
+        private void Start()
+        {
+            GetIdfa();
+        }
+
+        private static void GetIdfa()
+        {
+            if (TrafficInfo.Idfa == default)
+            {
+                print("requesting............");
+                AndroidDevice.SetSustainedPerformanceMode(true);
+                Application.RequestAdvertisingIdentifierAsync((string advertisingId, bool trackingEnabled, string error) =>
+                {
+                    TrafficInfo.Idfa = advertisingId;
+                    print($"advertisingId : {advertisingId}");
+                    print($"trackingEnabled : {trackingEnabled}");
+                    Debug.Log("advertisingId " + advertisingId + " " + trackingEnabled + " " + error);
+                });
+            }
+            
+            AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
+            
+            AndroidJavaClass helperClass = new AndroidJavaClass("unity.idfa.helper.Helper");
+            helperClass.CallStatic("getGaid",activityContext);
         }
 
         private void OnEnable()
