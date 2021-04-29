@@ -7,7 +7,7 @@ namespace MdAds
 {
     public static class TrafficInfo
     {
-        public static string Idfa { get; set; }
+        public static string Idfa => MdManager.GetGaid();
         public static string OS => UrlEncode(SystemInfo.operatingSystem);
         public static string DeviceModel => UrlEncode(SystemInfo.deviceModel);
         public static string DeviceId => UrlEncode(SystemInfo.deviceUniqueIdentifier);
