@@ -104,6 +104,7 @@ namespace MdAds
         private void InitWebView()
         {
             var webViewGameObject = new GameObject("UniWebView");
+            webViewGameObject.transform.SetParent(transform);
             _webView = webViewGameObject.AddComponent<UniWebView>();
         }
 
