@@ -21,14 +21,14 @@
   * 比如你需要的尺寸是320x50，对应的是Ad Placement 320x50.prefab。
 * 将Ad Placement 320x50.prefab放在UI Canvas里面合适的位置。
 
-![image-20210525160627835](./readme images/image-20210525160627835.png)
+![image-20210525160627835](https://github.com/bengdan/MD-Ads-SDK/blob/2020/readme%20images/image-20210525160627835.png)
 
 ### 显示/隐藏广告
 
 * 自动显示隐藏
   * 选中广告的Prefab，在inspector里面勾选Auto Show和Auto Hide。
 
-![image-20210525161057273](./readme images/image-20210525161057273.png)
+![image-20210525161057273](https://github.com/bengdan/MD-Ads-SDK/blob/2020/readme%20images/image-20210525161057273.png)
 
 * 手动显示隐藏（Auto Show/Hide 需要取消勾选）
 
@@ -58,5 +58,5 @@
 1. `play-services-ads-identifier-17.0.0.aar`和`play-services-basement-17.0.0.aar`跟项目其他SDK的出现重复情况：在Project/Assets/MdAds/Plugins/Android/目录中找到冲突的aar文件，删掉即可。
 2. `jetified-kotlin-stdlib-1.3.72.jar`和`jetified-androidx.browser.browser-1.0.0-runtime.jar`跟项目其他SDK出现重复情况：在Project/Assets/Editor/UniWebView/settings.asset中有添加Kotlin和Android Browser依赖的开关，取消对应的依赖即可。
 
-![image-20210525163339229](./readme images/image-20210525163339229.png)
+![image-20210525163339229](https://github.com/bengdan/MD-Ads-SDK/blob/2020/readme%20images/image-20210525163339229.png)
 
