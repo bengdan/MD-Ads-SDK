@@ -12,7 +12,7 @@ namespace MdAds
 
         public static void InitMdSdk()
         {
-#if UNITY_ANDROID
+#if !UNITY_EDITOR && UNITY_ANDROID
             RequestGaid();
 #endif
         }
