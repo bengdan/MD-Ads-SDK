@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace MdAds
 {
@@ -12,23 +14,36 @@ namespace MdAds
         public Image iconImage;
         public Image viceIconImage;
         public Sprite defaultSprite;
+        public Text ctaText;
+        public Button button;
 
-        private void Start()
+        private DateTime _lastRefreshTime;
+
+        private void OnEnable()
         {
-            StartCoroutine(UpdateSprite(iconImage, "https://play-lh.googleusercontent.com/Ar4Z09h1iNhpA7c9cGam6-QvUrTu45RYkR4ojiA0Oy5X7J1BR_1Z_a63FFCgfSoSojE"));
-            StartCoroutine(UpdateSprite(viceIconImage, "https://play-lh.googleusercontent.com/bAqioAlSPETHgkEoAk3ZumIpuBBrE7-MWi7XPqPz7CkLVwcsK4SGsa47HFYhHu2QOg"));
-            animator.Play("3 Parts");
-            StartCoroutine(GetRequest("http://ads.playforhigh.com/get_ads?placementwidth=512&placementheight=512&os=Android%20OS%2010%20/%20API-29%20(QKQ1.190716.003/2011091812)&devicemodel=OnePlus%20GM1910&idfa=&deviceid=0c0371bfa92a830ed319db989917be9d&appname=MD-Ads-SDK&bundle=com.MLD.MDAdsSDK&appversion=1.1.0&publisher_id=1000163&channel=MD-SDK%3A512x512&adtype=native"));
+            LoadAd();
         }
-        
-        
-        IEnumerator GetRequest(string uri)
+
+        private void LoadAd()
         {
-            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            var url =
+                $"http://ads.playforhigh.com/get_ads?placementwidth=512&placementheight=512&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&ifa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel={TrafficInfo.Bundle}%3A512x512&adtype=native";
+            StartCoroutine(GetCampaign(url));
+            _lastRefreshTime = DateTime.Now;
+            Invoke(nameof(RefreshCampaign),15.5f);
+        }
+
+        private void RefreshCampaign()
+        {
+            if (gameObject.activeInHierarchy && DateTime.Now - _lastRefreshTime >= TimeSpan.FromSeconds(15) ) LoadAd();
+        }
+
+        IEnumerator GetCampaign(string url)
+        {
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
                 // Request and wait for the desired page.
                 yield return webRequest.SendWebRequest();
-
 
                 switch (webRequest.result)
                 {
@@ -39,25 +54,48 @@ namespace MdAds
                         break;
                     case UnityWebRequest.Result.Success:
                         var result = JsonUtility.FromJson<Campaign>(webRequest.downloadHandler.text);
-                        print(result);
+                        UpdateCampaign(result);
                         break;
                 }
             }
         }
 
-        public void LoadAd()
+        private void UpdateCampaign(Campaign result)
         {
+            //set content from internet
+            StartCoroutine(UpdateSprite(iconImage, result.ImgMain));
+            ctaText.text = result.CtaText == "" ? "Play" : result.CtaText;
+            if (result.ImgVice != "") StartCoroutine(UpdateSprite(viceIconImage, result.ImgVice));
             
-        }
-
-        public void ShowAd()
-        {
-
-        }
-
-        public void HideAd()
-        {
+            // update animation
+            if (Random.Range(0, 2) == 0)
+                animator.Play(result.ImgVice != "" ? "3 Parts" : "2 Parts");
+            else
+                animator.Play("Shake");
             
+            // bind landing page
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(call: () =>
+            {
+                Application.OpenURL(result.LandingPage);
+                foreach (var click in result.ClickTracking) StartCoroutine(FireLink(click));
+            });
+            
+            // fire imps
+            foreach (var imp in result.ImpTracking)
+            {
+                StartCoroutine(FireLink(imp));
+            }
+        }
+        
+        IEnumerator FireLink(string url)
+        {
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+            {
+                // Request and wait for the desired page.
+                yield return webRequest.SendWebRequest();
+                if (webRequest.result == UnityWebRequest.Result.Success) Debug.Log($"link reported : {url}");
+            }
         }
 
         private IEnumerator UpdateSprite(Image img,string mediaUrl)
@@ -74,9 +112,9 @@ namespace MdAds
             {
                 Debug.Log(request.error);
             }
-        } 
-        
-        public class Campaign
+        }
+
+        private class Campaign
         {
             public string ImgMain;
             public string ImgVice;
