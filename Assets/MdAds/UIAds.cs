@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ namespace MdAds
             animator.Play("3 Parts");
         }
 
-        public void LoadAd(bool showAfter = false)
+        public void LoadAd()
         {
             
         }
@@ -50,5 +51,14 @@ namespace MdAds
             }
         } 
         
+        public class Campaign
+        {
+            public string ImgMain;
+            public string ImgVice;
+            public string CtaText;
+            public string LandingPage;
+            public List<string> ImpTracking;
+            public List<string> ClickTracking;
+        }
     }
 }
