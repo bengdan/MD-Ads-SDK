@@ -1,148 +1,123 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Android;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace MdAds
 {
     public class UIAds : MonoBehaviour
     {
-        [SerializeField]
-        private int width;
+        public Animator animator;
+        public Image iconImage;
+        public Image viceIconImage;
+        public Sprite defaultSprite;
+        public Text ctaText;
+        public Button button;
 
-        [SerializeField]
-        private int height;
-
-        [SerializeField] 
-        private bool isDebug;
-        
-        [SerializeField] 
-        private bool autoShow;
-
-        [SerializeField] 
-        private bool autoHide;
-
-        private UniWebView _webView;
-        private bool _noAds = true;
-
-        private void Awake()
-        {
-            InitWebView();
-            Destroy(GetComponent<Image>());
-        }
+        private DateTime _lastRefreshTime;
 
         private void OnEnable()
         {
-            if (!autoShow) return;
-            LoadAd(true);
+            LoadAd();
         }
 
-        private void OnDisable()
+        private void LoadAd()
         {
-            if (autoHide)
-            {
-                HideAd();
-            }
+            var url =
+                $"http://ads.playforhigh.com/get_ads?placementwidth=512&placementheight=512&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&ifa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel={TrafficInfo.Bundle}%3A512x512&adtype=native";
+            StartCoroutine(GetCampaign(url));
+            _lastRefreshTime = DateTime.Now;
+            Invoke(nameof(RefreshCampaign),15.5f);
         }
 
-        public void LoadAd(bool showAfter = false)
+        private void RefreshCampaign()
         {
-            var url = $"http://ads.game.melozen.com/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel={TrafficInfo.Bundle}%3A{width}x{height}";
-            _webView.ReferenceRectTransform = GetComponent<RectTransform>();
-            _webView.Load(url);
-            
-            if (isDebug)
+            if (gameObject.activeInHierarchy && DateTime.Now - _lastRefreshTime >= TimeSpan.FromSeconds(15) ) LoadAd();
+        }
+
+        IEnumerator GetCampaign(string url)
+        {
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
-                GUIUtility.systemCopyBuffer = url;
-            }
-            
-            // Add Callback
-            _webView.OnPageFinished += (view, code, s) =>
-            {
-                _webView.SetOpenLinksInExternalBrowser(true);
-                
-                _noAds = code != 200;
-                if (showAfter)
+                // Request and wait for the desired page.
+                yield return webRequest.SendWebRequest();
+
+                if (!webRequest.isNetworkError)
                 {
-                    ShowAd();
+                    if (!webRequest.downloadHandler.text.Contains("not match"))
+                    {
+                        var result = JsonUtility.FromJson<Campaign>(webRequest.downloadHandler.text);
+                        UpdateCampaign(result);
+                    }
                 }
-                if (!isDebug) return;
-                ShowTip(code== 200 ? "Ad loaded!":$"No Ads! code :{code}");
-            };
-
-            // Capture Landing Pages
-            _webView.AddUrlScheme("md");
-            _webView.OnMessageReceived += (view, message) =>
-            {
-                if (message.Scheme == "md")
-                {
-                    if (message.Path != "landing-page") return;
-                    
-                    var hasUrl = message.Args.ContainsKey("url");
-                    if (!hasUrl) return;
-                    
-                    var landingPage = message.Args["url"];
-                    Application.OpenURL(Uri.UnescapeDataString(landingPage));
-                }
-            };
-        }
-
-        public void ShowAd()
-        {
-            if (_noAds || !gameObject.activeInHierarchy)
-            {
-                return;
             }
-            _webView.Show();
         }
 
-        public void HideAd()
+        private void UpdateCampaign(Campaign result)
         {
-            _webView.Hide();
-        }
-
-        private void InitWebView()
-        {
-            var webViewGameObject = new GameObject("UniWebView");
-            webViewGameObject.transform.SetParent(transform);
-            _webView = webViewGameObject.AddComponent<UniWebView>();
-        }
-
-        private void ShowTip(string msg)
-        {
-#if UNITY_ANDROID
-            ShowToast(msg);
-#elif UNITY_IOS
-            Debug.Log(msg);
-#endif
+            //set content from internet
+            StartCoroutine(UpdateSprite(iconImage, result.ImgMain));
+            ctaText.text = result.CtaText == "" ? "Play" : result.CtaText;
+            if (result.ImgVice != "") StartCoroutine(UpdateSprite(viceIconImage, result.ImgVice));
+            
+            // update animation
+            if (Random.Range(0, 2) == 0)
+                animator.Play(result.ImgVice != "" ? "3 Parts" : "2 Parts");
+            else
+                animator.Play("Shake");
+            
+            // bind landing page
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(call: () =>
+            {
+                Application.OpenURL(result.LandingPage);
+                foreach (var click in result.ClickTracking) StartCoroutine(FireLink(click));
+            });
+            
+            // fire imps
+            foreach (var imp in result.ImpTracking)
+            {
+                StartCoroutine(FireLink(imp));
+            }
         }
         
-        
-        private void ShowToast(string msg)
+        IEnumerator FireLink(string url)
         {
-            //create a Toast class object
-            AndroidJavaClass toastClass =
-                new AndroidJavaClass("android.widget.Toast");
-
-            //create an array and add params to be passed
-            object[] toastParams = new object[3];
-            AndroidJavaClass unityActivity =
-                new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            toastParams[0] =
-                unityActivity.GetStatic<AndroidJavaObject>
-                    ("currentActivity");
-            toastParams[1] = msg;
-            toastParams[2] = toastClass.GetStatic<int>
-                ("LENGTH_LONG");
-
-            //call static function of Toast class, makeText
-            AndroidJavaObject toastObject =
-                toastClass.CallStatic<AndroidJavaObject>
-                    ("makeText", toastParams);
-
-            //show toast
-            toastObject.Call("show");
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+            {
+                // Request and wait for the desired page.
+                yield return webRequest.SendWebRequest();
+                if (!webRequest.isNetworkError) Debug.Log($"link reported : {url}");
+            }
         }
 
+        private IEnumerator UpdateSprite(Image img,string mediaUrl)
+        {   
+            var request = UnityWebRequestTexture.GetTexture(mediaUrl);
+            yield return request.SendWebRequest();
+            img.sprite = defaultSprite;
+            if (!request.isNetworkError)
+            {
+                var tx = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                img.sprite = Sprite.Create(tx,new Rect(0,0,tx.width,tx.height),Vector2.zero);
+            }
+            else
+            {
+                Debug.Log(request.error);
+            }
+        }
+
+        private class Campaign
+        {
+            public string ImgMain;
+            public string ImgVice;
+            public string CtaText;
+            public string LandingPage;
+            public List<string> ImpTracking;
+            public List<string> ClickTracking;
+        }
     }
 }

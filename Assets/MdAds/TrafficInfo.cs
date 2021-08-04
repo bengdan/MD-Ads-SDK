@@ -14,10 +14,6 @@ namespace MdAds
         public static string AppName => UrlEncode(Application.productName);
         public static string AppVersion => UrlEncode(Application.version);
         public static string Bundle => UrlEncode(Application.identifier);
-
-        private static string UrlEncode(string param)
-        {
-            return Uri.EscapeUriString(param);
-        }
+        private static string UrlEncode(string param) => Uri.EscapeUriString(param);
     }
 }
