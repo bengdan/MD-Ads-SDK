@@ -53,8 +53,11 @@ namespace MdAds
                     case UnityWebRequest.Result.ProtocolError:
                         break;
                     case UnityWebRequest.Result.Success:
-                        var result = JsonUtility.FromJson<Campaign>(webRequest.downloadHandler.text);
-                        UpdateCampaign(result);
+                        if (!webRequest.downloadHandler.text.Contains("not match"))
+                        {
+                            var result = JsonUtility.FromJson<Campaign>(webRequest.downloadHandler.text);
+                            UpdateCampaign(result);
+                        }
                         break;
                 }
             }
