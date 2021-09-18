@@ -27,14 +27,14 @@ namespace MdAds
 
         public static string GetGaid()
         {
-#if UNITY_EDITOR
-            return "";
-#endif
+#if UNITY_ANDROID
             AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
 
             AndroidJavaClass helperClass = new AndroidJavaClass("unity.idfa.helper.Helper");
             return helperClass.GetStatic<string>("GAID");
+#endif
+            return "";
         }
     }
 }
