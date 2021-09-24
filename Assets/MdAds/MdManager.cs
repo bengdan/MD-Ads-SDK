@@ -4,8 +4,12 @@ namespace MdAds
 {
     public class MdManager : MonoBehaviour
     {
+        public static string AppId = "";
+        [Header("IOS Only")]
+        public string appId;
         private void Awake()
         {
+            AppId = appId;
             InitMdSdk();
         }
 

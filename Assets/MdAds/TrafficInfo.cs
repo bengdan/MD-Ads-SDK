@@ -13,7 +13,7 @@ namespace MdAds
         public static string DeviceId => UrlEncode(SystemInfo.deviceUniqueIdentifier);
         public static string AppName => UrlEncode(Application.productName);
         public static string AppVersion => UrlEncode(Application.version);
-        public static string Bundle => UrlEncode(Application.identifier);
+        public static string Bundle => UrlEncode(MdManager.AppId == ""?Application.identifier : MdManager.AppId);
         private static string UrlEncode(string param) => Uri.EscapeUriString(param);
     }
 }
