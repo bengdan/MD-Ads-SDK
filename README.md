@@ -54,7 +54,6 @@
 ### 依赖冲突的解决方案：
 
 1. `play-services-ads-identifier-17.0.0.aar`和`play-services-basement-17.0.0.aar`跟项目其他SDK的出现重复情况：在Project/Assets/MdAds/Plugins/Android/目录中找到冲突的aar文件，删掉即可。
-2. `jetified-kotlin-stdlib-1.3.72.jar`和`jetified-androidx.browser.browser-1.0.0-runtime.jar`跟项目其他SDK出现重复情况：在Project/Assets/Editor/UniWebView/settings.asset中有添加Kotlin和Android Browser依赖的开关，取消对应的依赖即可。
 
 ![image-20210525163339229](https://github.com/bengdan/MD-Ads-SDK/blob/2020/readme%20images/image-20210525163339229.png)
 
