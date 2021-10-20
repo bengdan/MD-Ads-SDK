@@ -55,5 +55,3 @@
 
 1. `play-services-ads-identifier-17.0.0.aar`和`play-services-basement-17.0.0.aar`跟项目其他SDK的出现重复情况：在Project/Assets/MdAds/Plugins/Android/目录中找到冲突的aar文件，删掉即可。
 
-![image-20210525163339229](https://github.com/bengdan/MD-Ads-SDK/blob/2020/readme%20images/image-20210525163339229.png)
-
