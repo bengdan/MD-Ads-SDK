@@ -12,7 +12,9 @@ namespace MdAds
 
         public static void InitMdSdk()
         {
+#if !UNITY_EDITOR && UNITY_ANDROID
             RequestGaid();
+#endif
         }
 
         private static void RequestGaid()
@@ -26,6 +28,10 @@ namespace MdAds
 
         public static string GetGaid()
         {
+#if UNITY_EDITOR
+            return "";
+#endif
+            
             AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             AndroidJavaObject activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
 
