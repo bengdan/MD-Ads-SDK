@@ -24,6 +24,7 @@ namespace MdAds
 
         private UniWebView _webView;
         private bool _noAds = true;
+        private bool _isShowing = false;
 
         private void Awake()
         {
@@ -66,8 +67,8 @@ namespace MdAds
                 {
                     ShowAd();
                 }
-                if (!isDebug) return;
-                ShowTip(code== 200 ? "Ad loaded!":$"No Ads! code :{code}");
+
+                if (isDebug) ShowTip(code == 200 ? "Ad loaded!" : $"No Ads! code :{code}");
             };
 
             // Capture Landing Pages
@@ -87,17 +88,29 @@ namespace MdAds
             };
         }
 
+        private void RefreshBanner()
+        {
+            if (_isShowing) LoadAd(false);
+        }
+
         public void ShowAd()
         {
             if (_noAds)
             {
                 return;
             }
+
+            _isShowing = true;
             _webView.Show();
+            if (!IsInvoking(nameof(RefreshBanner)))
+            {
+                InvokeRepeating(nameof(RefreshBanner),.1f,MdManager.MdBannerRefreshDuration);
+            }
         }
 
         public void HideAd()
         {
+            _isShowing = false;
             _webView.Hide();
         }
 
