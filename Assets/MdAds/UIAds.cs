@@ -48,7 +48,7 @@ namespace MdAds
 
         public void LoadAd(bool showAfter = false)
         {
-            var url = $"http://m1.67yo.net/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel=MD-SDK%3A{width}x{height}";
+            var url = $"http://m1.67yo.net/get_ads?placementwidth={width}&placementheight={height}&os={TrafficInfo.OS}&devicemodel={TrafficInfo.DeviceModel}&idfa={TrafficInfo.Idfa}&deviceid={TrafficInfo.DeviceId}&appname={TrafficInfo.AppName}&bundle={TrafficInfo.Bundle}&appversion={TrafficInfo.AppVersion}&publisher_id=1000163&channel={TrafficInfo.Bundle}%3A{width}x{height}";
             _webView.ReferenceRectTransform = GetComponent<RectTransform>();
             _webView.Load(url);
             
